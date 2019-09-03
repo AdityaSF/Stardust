@@ -1,92 +1,46 @@
 package adiitya.stardust.player;
 
-import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import adiitya.stardust.util.FileType;
+import adiitya.stardust.util.TerrariaFile;
+import lombok.Getter;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.math.BigInteger;
 
 public class Player {
 
-	private static final byte[] ENCRYPTION_KEY = generateKey();
-
 	private final File file;
 
-	public int version;
+	@Getter
+	private long version;
+	@Getter
+	private long revision;
+	@Getter
+	private boolean favourite;
 
-	public Player(File file) {
+	public Player(File file) throws BadPaddingException, IllegalBlockSizeException {
 
 		this.file = file;
-
 		init();
 	}
 
-	private void init() {
+	private void init() throws BadPaddingException, IllegalBlockSizeException {
 
-		try {
+		TerrariaFile plr = new TerrariaFile(file);
+		version = plr.readInt();
 
-			ByteBuffer buf = loadBytes();
+		validate(plr.readString(7), "relogic", "bad magic value: %s");
+		validate(plr.readFileType(), FileType.PLAYER, "bad file type: %s");
 
-			version = buf.get() & 0xFF;
-		} catch (BadPaddingException | IllegalBlockSizeException e) {
-			e.printStackTrace();
-		}
+		revision = plr.readInt();
+		favourite = plr.readLong().and(BigInteger.ONE).equals(BigInteger.ONE);
 	}
 
-	private ByteBuffer loadBytes() throws BadPaddingException, IllegalBlockSizeException {
+	private <T> void validate(T value, T expected, String message) {
 
-		Cipher cipher = getCipher();
-		byte[] bytes = loadFile();
-
-		return ByteBuffer.wrap(cipher.doFinal(bytes));
-	}
-
-	private byte[] loadFile() {
-
-		try {
-			return Files.readAllBytes(file.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return new byte[0];
-	}
-
-	private Cipher getCipher() {
-
-		SecretKey key = new SecretKeySpec(ENCRYPTION_KEY, "AES");
-		IvParameterSpec iv = new IvParameterSpec(ENCRYPTION_KEY);
-
-		try {
-
-			Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
-			aes.init(Cipher.DECRYPT_MODE, key, iv);
-
-			return aes;
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	private static byte[] generateKey() {
-
-		byte[] unpadded = "h3y_gUyZ".getBytes(StandardCharsets.UTF_8);
-		byte[] key = new byte[16];
-
-		for (int i = 0; i < 8; i++) {
-			key[i * 2] = unpadded[i];
-			key[1 + i * 2] = (byte) ((char) 0);
-		}
-
-		return key;
+		if (!value.equals(expected))
+			throw new IllegalArgumentException(String.format(message, value));
 	}
 }
