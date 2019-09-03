@@ -36,9 +36,13 @@ public class TerrariaFile {
 		return buf.getInt() & UNSIGNED_INT;
 	}
 
-	public BigInteger readLong() {
+	public BigInteger readUnsignedLong() {
 		return BigInteger.valueOf(buf.getLong())
 				.and(UNSIGNED_LONG);
+	}
+
+	public long readLong() {
+		return buf.getLong();
 	}
 
 	public String readString(int len) {
@@ -49,8 +53,17 @@ public class TerrariaFile {
 		return new String(bytes);
 	}
 
+	public String readString() {
+		return readString(buf.get());
+	}
+
 	public FileType readFileType() {
 		return FileType.of(buf.get());
+	}
+
+	public TerrariaFile at(int pos) {
+		buf.position(pos);
+		return this;
 	}
 
 	public void print(int len) {

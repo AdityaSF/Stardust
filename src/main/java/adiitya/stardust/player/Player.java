@@ -7,18 +7,13 @@ import lombok.Getter;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.io.File;
-import java.math.BigInteger;
 
 public class Player {
 
 	private final File file;
 
 	@Getter
-	private long version;
-	@Getter
-	private long revision;
-	@Getter
-	private boolean favourite;
+	private PlayerMetadata metadata;
 
 	public Player(File file) throws BadPaddingException, IllegalBlockSizeException {
 
@@ -29,13 +24,11 @@ public class Player {
 	private void init() throws BadPaddingException, IllegalBlockSizeException {
 
 		TerrariaFile plr = new TerrariaFile(file);
-		version = plr.readInt();
 
-		validate(plr.readString(7), "relogic", "bad magic value: %s");
+		validate(plr.at(4).readString(7), "relogic", "bad magic value: %s");
 		validate(plr.readFileType(), FileType.PLAYER, "bad file type: %s");
 
-		revision = plr.readInt();
-		favourite = plr.readLong().and(BigInteger.ONE).equals(BigInteger.ONE);
+		metadata = PlayerMetadata.fromTerariaFile(plr);
 	}
 
 	private <T> void validate(T value, T expected, String message) {
