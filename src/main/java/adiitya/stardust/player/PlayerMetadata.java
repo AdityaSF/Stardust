@@ -1,39 +1,44 @@
 package adiitya.stardust.player;
 
+import adiitya.stardust.io.BinaryReader;
 import adiitya.stardust.util.Difficulty;
 import adiitya.stardust.util.Playtime;
-import adiitya.stardust.util.TerrariaFile;
 import lombok.Getter;
-
-import java.math.BigInteger;
 
 public class PlayerMetadata {
 
-	@Getter private final long release;
-	@Getter private final long revision;
-	@Getter private final boolean favorite;
 	@Getter private final String name;
 	@Getter private final Difficulty difficulty;
 	@Getter private final Playtime playtime;
+	@Getter private final int hair;
+	@Getter private final byte hairDye;
+	@Getter private final byte hideAcessories;
+	@Getter private final byte hideEquipment;
+	@Getter private final byte hideMisc;
+	@Getter private final byte skinVariant;
+	@Getter private final int health;
+	@Getter private final int maxHealth;
+	@Getter private final int mana;
+	@Getter private final int maxMana;
 
-	private PlayerMetadata(long release, long revision, boolean favorite, String name, Difficulty difficulty, Playtime playtime) {
-		this.release = release;
-		this.revision = revision;
-		this.favorite = favorite;
-		this.name = name;
-		this.difficulty = difficulty;
-		this.playtime = playtime;
+	public PlayerMetadata(BinaryReader reader) {
+
+		this.name = reader.readString();
+		this.difficulty = Difficulty.of(reader.readByte());
+		this.playtime = Playtime.fromTicks(reader.readLong());
+		this.hair = reader.readInt();
+		this.hairDye = reader.readByte();
+		this.hideAcessories = reader.readByte();
+		this.hideEquipment = reader.readByte();
+		this.hideMisc = reader.readByte();
+		this.skinVariant = reader.readByte();
+		this.health = clamp(reader.readInt(), 0, 500);
+		this.maxHealth = clamp(reader.readInt(), 10, 500);
+		this.mana = clamp(reader.readInt(), 0, 300);
+		this.maxMana = clamp(reader.readInt(), 0, 200);
 	}
 
-	public static PlayerMetadata fromTerariaFile(TerrariaFile file) {
-
-		long release = file.at(0).readInt();
-		long revision = file.at(12).readInt();
-		boolean favorite = file.readUnsignedLong().and(BigInteger.ONE).equals(BigInteger.ONE);
-		String name = file.readString();
-		Difficulty difficulty = Difficulty.of(file.readByte());
-		Playtime playtime = Playtime.fromTerrariaFile(file);
-
-		return new PlayerMetadata(release, revision, favorite, name, difficulty, playtime);
+	private static int clamp(int value, int min, int max) {
+		return value < min ? min : Math.min(value, max);
 	}
 }
