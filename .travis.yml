@@ -3,3 +3,10 @@ jdk: openjdk8
 cache:
   directories:
     - $HOME/.m2
+addons:
+  sonarcloud:
+    organization: "adityasf"
+    token:
+      secure: "hrKo5zJQmxAGrdSCUJ94DZpNbCqDZYRUxYHM4pUSYlwPIX+n1Ld6O/8FsSgz0IPKuX7PQ9ejg5t1MypSereob2wzaDDbYqaOnfKYjQezU0ChrVyp1XD/srqf9E7r4LfDWYRjHLrAfZnGLULcnc2dDnRFkMwwWhDMqVkGZoyo6igiIX4Gj1gW393GIqXrEW2P7A7VKS4CXFwXFIxnPQzNdM7YY567JTUZJVAha+aUVrBUex85MPom6PqGnwTmpdhVBkEM5iZZRHvSfCZWR7ftzvYBEUDKIB8PgkOnWtCnj+SfUhOllH4clm7KWr1xV4di65EbImwQBqyH8ZBK5ujU7t3STg6LEU5gutl9l5C7gtFrgT7/kJ7O9lO6swLVyLMkfc6P38J/liz5ryGnlNXNXF6UYAaZDNqhRP7WCk/S4EtBn/7pizAULW3oL4D1DT1qYPZpRZcLHPic1iQR53D/jM/joEU1v3ebg8/fQmVqL+/rokzzXrkgRWO0O9zgY0ENTmdVuF/GgT6n/tXek5/+q2it7Fk0Mh+pxQT/VFzOGhGbdVDy2I7MOEIGHjIg5SOijF8XBecLRONdIzvGkJyfV3xnk31bA9ka3nR2ViAd1h+89FANNFlgcPiE62E8nq4Jqx7tNwBCIHlG6FlSOAj3hTKdH01TwZcrLCkg5iePVJQ="
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=AdityaSF_Stardust
