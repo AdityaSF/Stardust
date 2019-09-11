@@ -2,6 +2,8 @@ package adiitya.stardust.player;
 
 import adiitya.stardust.io.BinaryReader;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -20,6 +22,8 @@ import java.security.NoSuchAlgorithmException;
 
 public class Player {
 
+	private static final Logger log = LoggerFactory.getLogger(Player.class);
+
 	private final File file;
 
 	@Getter
@@ -28,13 +32,13 @@ public class Player {
 	@Getter
 	private PlayerMetadata playerMetadata;
 
-	public Player(File file) {
+	public Player(File file) throws IOException {
 
 		this.file = file;
 		init();
 	}
 
-	private void init() {
+	private void init() throws IOException {
 
 		try {
 
@@ -54,16 +58,10 @@ public class Player {
 			reader.skip(13);
 
 			playerMetadata = new PlayerMetadata(reader);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (InvalidAlgorithmParameterException e) {
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
+		} catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+			log.error("Unable to create Cipher instance", e);
+		} catch (InvalidAlgorithmParameterException | InvalidKeyException e) {
+			log.error("Unable to initialize Cipher instance", e);
 		}
 	}
 

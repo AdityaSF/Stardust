@@ -5,6 +5,8 @@ import adiitya.stardust.util.Difficulty;
 import adiitya.stardust.util.Playtime;
 import lombok.Getter;
 
+import java.util.Objects;
+
 public class PlayerMetadata {
 
 	@Getter private final String name;
@@ -22,6 +24,8 @@ public class PlayerMetadata {
 	@Getter private final int maxMana;
 
 	public PlayerMetadata(BinaryReader reader) {
+
+		Objects.requireNonNull(reader, "reader is null");
 
 		this.name = reader.readString();
 		this.difficulty = Difficulty.of(reader.readByte());
