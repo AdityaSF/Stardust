@@ -11,13 +11,19 @@ public class Playtime {
 	private final int minutes;
 	private final int seconds;
 
-	private Playtime(int hours, int minutes, int seconds) {
+	public Playtime(int hours, int minutes, int seconds) {
 
 		this.hours = hours;
 		this.minutes = minutes;
 		this.seconds = seconds;
 	}
 
+	/**
+	 * Converts the instance to a string in the format {@code hh:mm:ss}. The
+	 * values will be padded with zeros to a length of 2.
+	 *
+	 * @return the string
+	 */
 	@Override
 	public String toString() {
 		return IntStream.of(hours, minutes, seconds)
@@ -27,6 +33,12 @@ public class Playtime {
 				.replaceAll("^(0:)+", "");
 	}
 
+	/**
+	 * Converts .NET DateTime ticks into a Playtime instance. A tick is 10,000 milliseconds.
+	 *
+	 * @param ticks the ticks
+	 * @return the instance
+	 */
 	public static Playtime fromTicks(long ticks) {
 
 		AtomicLong ms = new AtomicLong(ticks / 10000L);
@@ -37,6 +49,13 @@ public class Playtime {
 		return new Playtime(hours, minutes, seconds);
 	}
 
+	/**
+	 * Removes the specified type of time from the total, then returns how much was removed.
+	 *
+	 * @param base the base time
+	 * @param unit the TimeUnit
+	 * @return the amount of time removed
+	 */
 	private static int removeTime(AtomicLong base, TimeUnit unit) {
 
 		long removed = unit.convert(base.get(), TimeUnit.MILLISECONDS);
