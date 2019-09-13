@@ -74,7 +74,7 @@ public class Player {
 		return key;
 	}
 
-	private <T> void validate(T value, T expected, String message) {
+	<T> void validate(T value, T expected, String message) {
 
 		if (!value.equals(expected))
 			throw new IllegalArgumentException(String.format(message, value));

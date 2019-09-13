@@ -146,6 +146,28 @@ public class BinaryReader {
 	}
 
 	/**
+	 * This method sets the position of the internal ByteBuffer. For testing purposes only.
+	 *
+	 * @param pos the position
+	 * @return the reader at the specified position
+	 */
+	BinaryReader at(int pos) {
+
+		buf.position(pos);
+
+		return this;
+	}
+
+	/**
+	 * The method gets the position of the internal ByteBuffer. For testing purposes only.
+	 *
+	 * @return the position
+	 */
+	int position() {
+		return buf.position();
+	}
+
+	/**
 	 * Reads an InputStream into a ByteBuffer. This method reads the
 	 * InputStream into a ByteArrayOutputStream before wrapping
 	 * the resulting byte array in a ByteBuffer. The ByteBuffer with
