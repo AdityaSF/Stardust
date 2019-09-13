@@ -12,10 +12,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -34,6 +31,9 @@ public class Player {
 
 	public Player(File file) throws IOException {
 
+		if (!file.exists() || !file.isFile())
+			throw new IOException("file is invalid");
+
 		this.file = file;
 		init();
 	}
@@ -47,11 +47,7 @@ public class Player {
 			Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 			cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(key));
 
-			BinaryReader reader;
-
-			try (InputStream in = Files.newInputStream(file.toPath(), StandardOpenOption.READ)) {
-				reader = new BinaryReader(new CipherInputStream(in, cipher));
-			}
+			BinaryReader reader = new BinaryReader(file.toPath(), in -> new CipherInputStream(in, cipher));
 
 			validate(reader.readInt(), 194, "Unsupported data version: %d");
 			validate(reader.readString(7), "relogic", "bad magic value: %s");
